@@ -10,6 +10,7 @@ from sklearn import tree
 from sklearn.externals.six import StringIO
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def visualize_graph(clf, header, output):
@@ -50,17 +51,17 @@ def get_data(file):
 
 
 def split_data(features, labels, count, ratio):
+    # x = features, y = targets
     print("Splitting training & test data...")
-    feature_train, feature_test, target_train, target_test = train_test_split(features, labels, test_size=ratio)
-    print("There were ", target_train.count(True), " fraud occurrences in ", int(count * ratio), " training samples.")
+    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=ratio)
+    print("There were ", y_train.count(True), " fraud occurrences in ", int(count * ratio), " training samples.")
 
-    return feature_train, feature_test, target_train, target_test
+    return x_train, x_test, y_train, y_test
 
 
 def train_clf(clf, x_train, y_train):
     print("Training classifier...")
     begin_time = time.time()
-    # clf = tree.DecisionTreeClassifier()
     clf.fit(x_train, y_train)
     print("Training done! Training duration: ", time.time() - begin_time, " seconds.")
 
@@ -90,12 +91,32 @@ def metrics(clf, x_test, y_test):
 
 
 def test_datum(clf, datum):
-    # while True:
-    #     x = input("Enter test datum (q to quit): ")
-    #
-    #     if x == "q":
-    #         break
-    #
+    x = input("Enter test datum (q to quit): ")
+
     datum = list(map(float, datum.split('\t')))
 
     return clf.predict(datum), clf.predict_proba(datum)
+
+
+def main():
+    print("Welcome.")
+
+    file = input("Enter data file: ")
+    headers, labels, features, count = get_data(file)
+
+    ratio = input("Enter split ration: ")
+    x_train, x_test, y_train, y_test = split_data(features, labels, count, ratio)
+
+    knn_clf = KNeighborsClassifier()
+    tree_clf = tree.DecisionTreeClassifier()
+
+    knn_clf = train_clf(knn_clf, x_train, y_train)
+    tree_clf = train_clf(tree_clf, x_train, y_train)
+
+    knn_score = metrics(knn_clf, x_test, y_test)
+    tree_score = metrics(tree_clf, x_test, y_test)
+    print("Tree classifier accuracy score: ", tree_score, " KNN Classifier accuracy score: ", knn_score)
+
+
+if __name__ == "__main__":
+    main()
