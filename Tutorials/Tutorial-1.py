@@ -1,3 +1,4 @@
+# differentiate between apples & oranges.
 from sklearn import tree
 
 features = [[140, 1], [130, 1], [150, 0], [170, 0]]
