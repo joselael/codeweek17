@@ -3,7 +3,9 @@
 import csv
 import time
 
+import pydotplus
 from sklearn import tree
+from sklearn.externals.six import StringIO
 
 print("getting data....")
 with open('creditcardnotime.csv', 'rt') as fi:
@@ -32,16 +34,15 @@ print("Decision tree training done! Training duration: ", time.time() - begin_ti
 print("There were ", labels.count(True), " fraud occurrences in ", number, " training samples.")
 
 # visualize graph
-# dot_data = tree.export_graphviz(clf, out_file=None)
-#
-# graph = graphviz.Source(dot_data)
-# graph.render("credit")
-# dot_data = tree.export_graphviz(clf, out_file=None,
-#                                 feature_names=header,
-#                                 filled=True, rounded=True,
-#                                 special_characters=True)
-# graph = graphviz.Source(dot_data)
-# graph
+dot_data = StringIO()
+tree.export_graphviz(clf,
+                     out_file=dot_data,
+                     feature_names=header,
+                     filled=True, rounded=True,
+                     impurity=False)
+
+graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+graph.write_pdf("visualization.pdf")
 
 # predict outcomes given inputs
 while True:
