@@ -19,8 +19,8 @@ with open('creditcardnotime.csv', 'rt') as csv_file:
     print("formatting and converting data...")
 
     # get features and labels
-    count = 0;
-    iterdata = iter(data);
+    count = 0
+    iterdata = iter(data)
     next(iterdata)  # skip the headers
     for index, value in enumerate(iterdata):
         labels.append(bool(int(value[29])))  # convert 0 to false and 1 to true
@@ -61,7 +61,7 @@ print("KNN accuracy: ", knn_score)
 
 # visualize graph
 dot_data = StringIO()
-tree.export_graphviz(clf,
+tree.export_graphviz(tree_clf,
                      out_file=dot_data,
                      feature_names=header,
                      filled=True, rounded=True,
@@ -79,3 +79,4 @@ while True:
 
     x = list(map(float, x.split('\t')))
     print("Tree result: ", tree_clf.predict(x), " with probability: ", tree_clf.predict_proba(x))
+    print("KNN result: ", knn_clf.predict(x), " with probability: ", knn_clf.predict_proba(x))
