@@ -27,7 +27,7 @@ def visualize_graph(clf, header, output):
 
 
 def get_data(file):
-    print("getting data....")
+    print("getting data...")
     with open(file, 'rt') as csv_file:
         reader = csv.reader(csv_file)
         data = list(reader)
@@ -69,7 +69,7 @@ def train_clf(clf, x_train, y_train):
 
 
 def metrics(clf, x_test, y_test):
-    print("Calculating accuracy metrics:")
+    print("Calculating accuracy metrics...")
     predictions = clf.predict(x_test)
     score = accuracy_score(y_test, predictions)
 
@@ -99,10 +99,10 @@ def test_datum(clf, datum):
 def main():
     print("Welcome.")
 
-    file = input("Enter data file: ")
+    file = input("Enter data file name: ")
     headers, labels, features, count = get_data(file)
 
-    ratio = input("Enter split ration: ")
+    ratio = float(input("Enter split ratio: "))
     x_train, x_test, y_train, y_test = split_data(features, labels, count, ratio)
 
     knn_clf = KNeighborsClassifier()
@@ -113,7 +113,9 @@ def main():
 
     knn_score = metrics(knn_clf, x_test, y_test)
     tree_score = metrics(tree_clf, x_test, y_test)
+
     print("Tree classifier accuracy score: ", tree_score, " KNN Classifier accuracy score: ", knn_score)
+
     while True:
         x = input("Enter test datum (q to quit): ")
 
