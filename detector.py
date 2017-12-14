@@ -35,7 +35,7 @@ def get_data(file):
         labels = list()
         features = list()
 
-        print("formatting and converting data...")
+        print("formatting and converting data...\n")
 
         # get features and labels
         count = 0
@@ -54,7 +54,7 @@ def split_data(features, labels, count, ratio):
     # x = features, y = targets
     print("Splitting training & test data...")
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=ratio)
-    print("There were ", y_train.count(True), " fraud occurrences in ", int(count * ratio), " training samples.")
+    print("There were ", y_train.count(True), " fraud occurrences in ", int(count * ratio), " training samples.\n")
 
     return x_train, x_test, y_train, y_test
 
@@ -63,7 +63,7 @@ def train_clf(clf, x_train, y_train):
     print("Training classifier...")
     begin_time = time.time()
     clf.fit(x_train, y_train)
-    print("Training done! Training duration: ", time.time() - begin_time, " seconds.")
+    print("Training done! Training duration: ", time.time() - begin_time, " seconds.\n")
 
     return clf
 
@@ -91,8 +91,6 @@ def metrics(clf, x_test, y_test):
 
 
 def test_datum(clf, datum):
-    x = input("Enter test datum (q to quit): ")
-
     datum = list(map(float, datum.split('\t')))
 
     return clf.predict(datum), clf.predict_proba(datum)
@@ -116,6 +114,16 @@ def main():
     knn_score = metrics(knn_clf, x_test, y_test)
     tree_score = metrics(tree_clf, x_test, y_test)
     print("Tree classifier accuracy score: ", tree_score, " KNN Classifier accuracy score: ", knn_score)
+    while True:
+        x = input("Enter test datum (q to quit): ")
+
+        if x == 'q':
+            break
+
+        result, probability = test_datum(tree_clf, x)
+        print("Tree Classifier result: {} with probability {}.".format(result, probability))
+        result, probability = test_datum(knn_clf, x)
+        print("KNN Classifier result: {} with probability {}.".format(result, probability))
 
 
 if __name__ == "__main__":
