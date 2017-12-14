@@ -38,7 +38,7 @@ while True:
         break
 
     x = list(map(float, x.split('\t')))
-    print(clf.predict([x]))
+    print(clf.predict(x), " with probability: ", clf.predict_proba(x))
 
 # print(features[0:1000])
 # print(labels[0:1000])
