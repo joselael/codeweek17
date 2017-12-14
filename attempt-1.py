@@ -28,8 +28,21 @@ print("Training decision tree... ")
 begin_time = time.time();
 clf = tree.DecisionTreeClassifier()
 clf.fit(features, labels)
-print("Decision tree training done! Traing duration: ", time.time() - begin_time, " seconds.")
+print("Decision tree training done! Training duration: ", time.time() - begin_time, " seconds.")
 print("There were ", labels.count(True), " fraud occurrences in ", number, " training samples.")
+
+# visualize graph
+# dot_data = tree.export_graphviz(clf, out_file=None)
+#
+# graph = graphviz.Source(dot_data)
+# graph.render("credit")
+# dot_data = tree.export_graphviz(clf, out_file=None,
+#                                 feature_names=header,
+#                                 filled=True, rounded=True,
+#                                 special_characters=True)
+# graph = graphviz.Source(dot_data)
+# graph
+
 # predict outcomes given inputs
 while True:
     x = input("Enter test datum (q to quit): ")
@@ -40,9 +53,3 @@ while True:
     x = list(map(float, x.split('\t')))
     print(clf.predict(x), " with probability: ", clf.predict_proba(x))
 
-# print(features[0:1000])
-# print(labels[0:1000])
-# print(labels[0:50000].count(True)) # how many occurrences of fraud are there in the subset?
-
-# print(feature[0])
-# print(data[99999])
