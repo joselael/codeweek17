@@ -15,6 +15,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.neural_network import MLPClassifier
+from imblearn.over_sampling import SMOTE
 
 
 # from sklearn
@@ -38,43 +39,49 @@ def get_data(file):
         reader = csv.reader(csv_file)
         data = list(reader)
         header = data[0][0:29]
-        labels = list()
+        targets = list()
         features = list()
         fraud_features = list()
-        fraud_labels = list()
+        fraud_targets = list()
 
         print("formatting and converting data...\n")
 
-        # get features and labels
+        # get features and targets
         count = 0
         iterdata = iter(data)
         next(iterdata)  # skip the headers
         for index, value in enumerate(iterdata):
 
-            labels.append(bool(int(value[29])))  # convert 0 to false and 1 to true
+            targets.append(bool(int(value[29])))  # convert 0 to false and 1 to true
 
-            if labels[index]:
-                fraud_labels.append(True)
+            if targets[index]:
+                fraud_targets.append(True)
                 fraud_features.append([float(i) for i in value[0:29]])
 
             features.append(
                 [float(i) for i in value[0:29]])  # convert the first 28 elements of the line to a float list
             count += 1
 
-    return header, labels, features, count, fraud_labels, fraud_features
+    return header, targets, features, count, fraud_targets, fraud_features
 
 
-def split_data(features, labels, count, ratio):
+def split_data(features, targets, count, ratio):
     # x = features, y = targets
     print("Splitting training & test data...")
-    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=ratio)
+    x_train, x_test, y_train, y_test = train_test_split(features, targets, test_size=ratio)
     print("There were ", y_train.count(True), " fraud occurrences in ", int(count * ratio), " training samples.\n")
 
     return x_train, x_test, y_train, y_test
 
 
+def over_sample(x, y):
+    sm = SMOTE()
+
+    return sm.fit_sample(x, y)
+
+
 def train_clf(clf, x_train, y_train):
-    print("Training classifier ", clf.__str__()[:16], "...")
+    print("Training classifier ", clf.__str__()[:10], "...")
     begin_time = time.time()
     clf.fit(x_train, y_train)
     print("Training done! Training duration: ", time.time() - begin_time, " seconds.\n")
@@ -89,7 +96,7 @@ def train_clf(clf, x_train, y_train):
 
 
 def accuracy_precision_recall_metrics(clf, x_test, y_test):
-    print("Calculation precision metrics for ", clf.__str__()[:10], "...\n")
+    print("Calculating precision metrics for ", clf.__str__()[:10], "...")
 
     predictions = clf.predict(x_test)
     return accuracy_score(y_test, predictions), precision_score(y_test, predictions, average='macro'), \
@@ -106,50 +113,72 @@ def main():
     print("Welcome.")
 
     file = input("Enter data file name: ")
-    headers, labels, features, count, fraud_labels, fraud_features = get_data(file)
+    headers, targets, features, count, fraud_targets, fraud_features = get_data(file)
 
     ratio = float(input("Enter split ratio: "))
-    x_train, x_test, y_train, y_test = split_data(features, labels, count, ratio)
+    x_train, x_test, y_train, y_test = split_data(features, targets, count, ratio)
 
-    knn_clf = KNeighborsClassifier()
+    # ** Over-sample training data using smote ** #
+    x_train, y_train = over_sample(x_train, y_train)
+
+    # knn_clf = KNeighborsClassifier()
     tree_clf = tree.DecisionTreeClassifier()
     gaus_clf = GaussianNB()
     rf_clf = RandomForestClassifier()
     log_clf = LogisticRegression()
-    mlp_clf = MLPClassifier()
+    # mlp_clf = MLPClassifier()
     # svc_clf = SVC()
+    eclf = VotingClassifier(estimators=[('lr', log_clf), ('rf', rf_clf), ('gnb', gaus_clf),
+                                        ('tree', tree_clf)], voting='hard', n_jobs=-1)
 
-    knn_clf = train_clf(knn_clf, x_train, y_train)
+    # for clf, label in zip([log_clf, rf_clf, gaus_clf, tree_clf, eclf],
+    #                       ['Logistic Regression', 'Random Forest', 'naive Bayes',
+    #                        'Tree', 'Ensemble']):
+    #     scores = cross_val_score(clf, features, targets, cv=3, scoring='accuracy')
+    #     print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
+
+    # knn_clf = train_clf(knn_clf, x_train, y_train)
     tree_clf = train_clf(tree_clf, x_train, y_train)
     gaus_clf = train_clf(gaus_clf, x_train, y_train)
     rf_clf = train_clf(rf_clf, x_train, y_train)
     log_clf = train_clf(log_clf, x_train, y_train)
-    mlp_clf = train_clf(mlp_clf, x_train, y_train)
+    # mlp_clf = train_clf(mlp_clf, x_train, y_train)
     # svc_clf = train_clf(svc_clf, x_train, y_train)
+    eclf = train_clf(eclf, x_train, y_train)
 
     # # ** TEST FRAUD RECOGNITION RATE ** #
-    # knn_catch_rate = metrics(knn_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # tree_catch_rate = metrics(tree_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # gaus_catch_rate = metrics(gaus_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # rf_catch_rate = metrics(rf_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # log_catch_rate = metrics(log_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # mlp_catch_rate = metrics(mlp_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
-    # # svc_catch_rate = metrics(svc_clf, fraud_features, fraud_labels) / len(fraud_labels) * 100
+    # knn_catch_rate = accuracy_precision_recall_metrics(knn_clf, fraud_features, fraud_targets)[0] / len(fraud_targets) * 100
+    tree_catch_rate = accuracy_precision_recall_metrics(tree_clf, fraud_features, fraud_targets)[0] / len(
+        fraud_targets) * 100
+    gaus_catch_rate = accuracy_precision_recall_metrics(gaus_clf, fraud_features, fraud_targets)[0] / len(
+        fraud_targets) * 100
+    rf_catch_rate = accuracy_precision_recall_metrics(rf_clf, fraud_features, fraud_targets)[0] / len(
+        fraud_targets) * 100
+    log_catch_rate = accuracy_precision_recall_metrics(log_clf, fraud_features, fraud_targets)[0] / len(
+        fraud_targets) * 100
+    # mlp_catch_rate = accuracy_precision_recall_metrics(mlp_clf, fraud_features, fraud_targets)[0] / len(fraud_targets) * 100
+    # # svc_catch_rate = metrics(svc_clf, fraud_features, fraud_targets) / len(fraud_targets) * 100
 
-    print("Tree classifier metrics: ", accuracy_precision_recall_metrics(tree_clf, x_test, y_test))
-    print("KNN Classifier metrics: ", accuracy_precision_recall_metrics(knn_clf, x_test, y_test))
-    print("Gaussian classifier metrics: ", accuracy_precision_recall_metrics(gaus_clf, x_test, y_test))
-    print("Random Forest Classifier metrics: ", accuracy_precision_recall_metrics(rf_clf, x_test, y_test))
-    print("Logistic Regression classifier metrics: ", accuracy_precision_recall_metrics(log_clf, x_test, y_test))
-    print("MLP Neural-Net Regression classifier metrics: ", accuracy_precision_recall_metrics(mlp_clf, x_test, y_test))
+    eclf_catch_rate = accuracy_precision_recall_metrics(eclf, fraud_features, fraud_targets)[0] / len(
+        fraud_targets) * 100
+
+    # print("KNN classifier catch rate: ", knn_catch_rate)
+    print("Tree classifier catch rate: ", tree_catch_rate)
+    print("Gaussian classifier catch rate: ", gaus_catch_rate)
+    print("Random Forest classifier catch rate: ", rf_catch_rate)
+    print("Log Regression classifier catch rate: ", log_catch_rate)
+    # print("MLP NN classifier catch rate: ", mlp_catch_rate)
+    print("Ensemble NN classifier catch rate: ", eclf_catch_rate)
+
+    # print("Tree classifier metrics: ", accuracy_precision_recall_metrics(tree_clf, x_test, y_test))
+    # print("KNN Classifier metrics: ", accuracy_precision_recall_metrics(knn_clf, x_test, y_test))
+    # print("Gaussian classifier metrics: ", accuracy_precision_recall_metrics(gaus_clf, x_test, y_test))
+    # print("Random Forest Classifier metrics: ", accuracy_precision_recall_metrics(rf_clf, x_test, y_test))
+    # print("Logistic Regression classifier metrics: ", accuracy_precision_recall_metrics(log_clf, x_test, y_test))
+    # print("MLP Neural-Net Regression classifier metrics: ", accuracy_precision_recall_metrics(mlp_clf, x_test, y_test))
+    # print("Ensemble Classifier metrics: ", accuracy_precision_recall_metrics(eclf, x_test, y_test))
+
     # print("SVC classifier catch rate: ", svc_catch_rate)
-
-
-    #
-    # knn_score = metrics(knn_clf, x_test, y_test)
-    # tree_score = metrics(tree_clf, x_test, y_test)
-    #
-    # print("Tree classifier accuracy score: ", tree_score, " KNN Classifier accuracy score: ", knn_score)
 
     # while True:
     #     x = input("Enter test datum (q to quit): ")
@@ -161,7 +190,7 @@ def main():
     #     print("Tree Classifier result: {} with probability {}.".format(result, probability))
     #     result, probability = test_datum(knn_clf, x)
     #     print("KNN Classifier result: {} with probability {}.".format(result, probability))
-    print("Bye")
+    print("Bye!")
 
 
 if __name__ == "__main__":
