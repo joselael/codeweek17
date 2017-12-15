@@ -208,6 +208,13 @@ while True:
     filename = input("Enter transaction file name (q to quit): ")
     if filename == 'q':
         break
-    print(myDetector.test_transaction(model, filename)[0][0])
+
+    # print(myDetector.test_transaction(model, filename))
+    fraudulent = myDetector.test_transaction(model, filename)[0][0]
+    probability = myDetector.test_transaction(model, filename)[1][0][1]
+    if fraudulent:
+        print("Fraudulent transaction detected! Probability: " + "{:.4%}".format(probability))
+    else:
+        print("Transaction is not fraudulent. Probability: " + "{:.4%}".format(probability))
 
 print("end")
