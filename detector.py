@@ -125,8 +125,8 @@ class Detector:
         log_clf = LogisticRegression()
         # mlp_clf = MLPClassifier()
         # svc_clf = SVC()
-        eclf = VotingClassifier(estimators=[('lr', log_clf), ('rf', rf_clf), ('gnb', gaus_clf),
-                                            ('tree', tree_clf)], voting='hard', n_jobs=-1)
+        # eclf = VotingClassifier(estimators=[('lr', log_clf), ('rf', rf_clf), ('gnb', gaus_clf),
+        #                                     ('tree', tree_clf)], voting='hard', n_jobs=-1)
 
         # for clf, label in zip([log_clf, rf_clf, gaus_clf, tree_clf, eclf],
         #                       ['Logistic Regression', 'Random Forest', 'naive Bayes',
@@ -135,37 +135,37 @@ class Detector:
         #     print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
 
         # knn_clf = train_clf(knn_clf, x_train, y_train)
-        tree_clf = self.train_clf(tree_clf, x_train, y_train)
-        gaus_clf = self.train_clf(gaus_clf, x_train, y_train)
-        rf_clf = self.train_clf(rf_clf, x_train, y_train)
+        # tree_clf = self.train_clf(tree_clf, x_train, y_train)
+        # gaus_clf = self.train_clf(gaus_clf, x_train, y_train)
+        # rf_clf = self.train_clf(rf_clf, x_train, y_train)
         log_clf = self.train_clf(log_clf, x_train, y_train)
         # mlp_clf = train_clf(mlp_clf, x_train, y_train)
         # svc_clf = train_clf(svc_clf, x_train, y_train)
-        eclf = self.train_clf(eclf, x_train, y_train)
+        # eclf = self.train_clf(eclf, x_train, y_train)
 
         # # ** TEST FRAUD RECOGNITION RATE ** #
         # knn_catch_rate = accuracy_precision_recall_metrics(knn_clf, fraud_features, fraud_targets)[0] / len(fraud_targets) * 100
-        tree_catch_rate = self.accuracy_precision_recall_metrics(tree_clf, fraud_features, fraud_targets)[0] / len(
-            fraud_targets) * 100
-        gaus_catch_rate = self.accuracy_precision_recall_metrics(gaus_clf, fraud_features, fraud_targets)[0] / len(
-            fraud_targets) * 100
-        rf_catch_rate = self.accuracy_precision_recall_metrics(rf_clf, fraud_features, fraud_targets)[0] / len(
-            fraud_targets) * 100
-        log_catch_rate = self.accuracy_precision_recall_metrics(log_clf, fraud_features, fraud_targets)[0] / len(
-            fraud_targets) * 100
+        # tree_catch_rate = self.accuracy_precision_recall_metrics(tree_clf, fraud_features, fraud_targets)[0] / len(
+        #     fraud_targets) * 100
+        # gaus_catch_rate = self.accuracy_precision_recall_metrics(gaus_clf, fraud_features, fraud_targets)[0] / len(
+        #     fraud_targets) * 100
+        # rf_catch_rate = self.accuracy_precision_recall_metrics(rf_clf, fraud_features, fraud_targets)[0] / len(
+        #     fraud_targets) * 100
+        # log_catch_rate = self.accuracy_precision_recall_metrics(log_clf, fraud_features, fraud_targets)[0] / len(
+        #     fraud_targets) * 100
         # mlp_catch_rate = accuracy_precision_recall_metrics(mlp_clf, fraud_features, fraud_targets)[0] / len(fraud_targets) * 100
         # # svc_catch_rate = metrics(svc_clf, fraud_features, fraud_targets) / len(fraud_targets) * 100
 
-        eclf_catch_rate = self.accuracy_precision_recall_metrics(eclf, fraud_features, fraud_targets)[0] / len(
-            fraud_targets) * 100
+        # eclf_catch_rate = self.accuracy_precision_recall_metrics(eclf, fraud_features, fraud_targets)[0] / len(
+        #     fraud_targets) * 100
 
-        # print("KNN classifier catch rate: ", knn_catch_rate)
-        print("Tree classifier catch rate: ", tree_catch_rate)
-        print("Gaussian classifier catch rate: ", gaus_catch_rate)
-        print("Random Forest classifier catch rate: ", rf_catch_rate)
-        print("Log Regression classifier catch rate: ", log_catch_rate)
-        # print("MLP NN classifier catch rate: ", mlp_catch_rate)
-        print("Ensemble NN classifier catch rate: ", eclf_catch_rate)
+        # # print("KNN classifier catch rate: ", knn_catch_rate)
+        # print("Tree classifier catch rate: ", tree_catch_rate)
+        # print("Gaussian classifier catch rate: ", gaus_catch_rate)
+        # print("Random Forest classifier catch rate: ", rf_catch_rate)
+        # print("Log Regression classifier catch rate: ", log_catch_rate)
+        # # print("MLP NN classifier catch rate: ", mlp_catch_rate)
+        # print("Ensemble NN classifier catch rate: ", eclf_catch_rate)
 
         # print("Tree classifier metrics: ", accuracy_precision_recall_metrics(tree_clf, x_test, y_test))
         # print("KNN Classifier metrics: ", accuracy_precision_recall_metrics(knn_clf, x_test, y_test))
@@ -187,7 +187,11 @@ class Detector:
         #     print("Tree Classifier result: {} with probability {}.".format(result, probability))
         #     result, probability = test_datum(knn_clf, x)
         #     print("KNN Classifier result: {} with probability {}.".format(result, probability))
+
         print("Bye!")
 
     # if __name__ == "__main__":
     #     main()
+
+
+myDetector = Detector()
