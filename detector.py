@@ -106,23 +106,26 @@ class Detector:
 
             return self.test_datum(clf, content)
 
+    def get_clf(self):
+        return LogisticRegression()
+
     def __init__(self):
         print("Welcome.")
 
-        file = input("Enter data file name: ")
-        headers, targets, features, count, fraud_targets, fraud_features = self.get_data(file)
-
-        ratio = float(input("Enter split ratio: "))
-        x_train, x_test, y_train, y_test = self.split_data(features, targets, count, ratio)
-
-        # ** Over-sample training data using smote ** #
-        x_train, y_train = self.over_sample(x_train, y_train)
+        # file = input("Enter data file name: ")
+        # headers, targets, features, count, fraud_targets, fraud_features = self.get_data(file)
+        #
+        # ratio = float(input("Enter split ratio: "))
+        # x_train, x_test, y_train, y_test = self.split_data(features, targets, count, ratio)
+        #
+        # # ** Over-sample training data using smote ** #
+        # x_train, y_train = self.over_sample(x_train, y_train)
 
         # knn_clf = KNeighborsClassifier()
-        tree_clf = tree.DecisionTreeClassifier()
-        gaus_clf = GaussianNB()
-        rf_clf = RandomForestClassifier()
-        log_clf = LogisticRegression()
+        # tree_clf = tree.DecisionTreeClassifier()
+        # gaus_clf = GaussianNB()
+        # rf_clf = RandomForestClassifier()
+        # log_clf = self.get_clf()
         # mlp_clf = MLPClassifier()
         # svc_clf = SVC()
         # eclf = VotingClassifier(estimators=[('lr', log_clf), ('rf', rf_clf), ('gnb', gaus_clf),
@@ -138,7 +141,7 @@ class Detector:
         # tree_clf = self.train_clf(tree_clf, x_train, y_train)
         # gaus_clf = self.train_clf(gaus_clf, x_train, y_train)
         # rf_clf = self.train_clf(rf_clf, x_train, y_train)
-        log_clf = self.train_clf(log_clf, x_train, y_train)
+        # log_clf = self.train_clf(log_clf, x_train, y_train)
         # mlp_clf = train_clf(mlp_clf, x_train, y_train)
         # svc_clf = train_clf(svc_clf, x_train, y_train)
         # eclf = self.train_clf(eclf, x_train, y_train)
@@ -188,10 +191,23 @@ class Detector:
         #     result, probability = test_datum(knn_clf, x)
         #     print("KNN Classifier result: {} with probability {}.".format(result, probability))
 
-        print("Bye!")
+        # print("Bye!")
 
     # if __name__ == "__main__":
     #     main()
 
 
 myDetector = Detector()
+headers, targets, features, count, fraud_targets, fraud_features = myDetector.get_data('ccnotime.csv')
+x_train, x_test, y_train, y_test = myDetector.split_data(features, targets, count, .7)
+x_train, y_train = myDetector.over_sample(x_train, y_train)
+model = myDetector.get_clf()
+myDetector.train_clf(model, x_train, y_train)
+
+while True:
+    filename = input("Enter transaction file name (q to quit): ")
+    if filename == 'q':
+        break
+    print(myDetector.test_transaction(model, filename)[0][0])
+
+print("end")
