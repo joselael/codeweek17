@@ -10,15 +10,12 @@ from sklearn import tree
 from sklearn.externals.six import StringIO
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from sklearn.neural_network import MLPClassifier
+# from sklearn.neural_network import MLPClassifier
 from imblearn.over_sampling import SMOTE
-
-
-# from sklearn
 
 
 def visualize_graph(clf, header, output):
@@ -107,6 +104,12 @@ def test_datum(clf, datum):
     datum = list(map(float, datum.split('\t')))
 
     return clf.predict([datum]), clf.predict_proba([datum])
+
+
+def test_transaction(clf, file):
+    with open(file, 'rt') as file:
+        content = file.read()
+        return test_datum(clf, content)
 
 
 def main():

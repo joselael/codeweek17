@@ -10,10 +10,10 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -37,13 +37,13 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/result', methods=['GET','POST'])
+@app.route('/result', methods=['GET', 'POST'])
 def result():
-	if request.method == 'POST':
-		return redirect(url_for('index'))
-	elif request.method == 'GET':
-		return render_template('result.html')
+    if request.method == 'POST':
+        return redirect(url_for('index'))
+    elif request.method == 'GET':
+        return render_template('result.html')
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+    app.run(debug=True)
